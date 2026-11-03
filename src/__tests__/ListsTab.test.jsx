@@ -87,6 +87,14 @@ describe('ListsTab', () => {
     expect(screen.getByText('FIA Red Book 2025').closest('tr').querySelector('a').getAttribute('href')).toBe('https://www.fia.gov.pk/files/rb.pdf')
   })
 
+  it('links to the address alone when the backend adds a note after it', async () => {
+    const s = status()
+    s.UKSL.lists[0].source = 'https://sanctions.example/list.csv (+ aliases)'
+    setup(s)
+    await waitFor(() => screen.getByText('UK Sanctions List (FCDO)'))
+    expect(screen.getByText('UK Sanctions List (FCDO)').closest('tr').querySelector('a').getAttribute('href')).toBe('https://sanctions.example/list.csv')
+  })
+
   it('shows a source that has not been loaded yet, and one that failed with its reason', async () => {
     setup(status({
       UKSL: { cached: false, age_seconds: null, records: 0, error: null, lists: [] },

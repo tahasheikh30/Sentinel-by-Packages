@@ -50,7 +50,8 @@ function listRows(key, s) {
       reason,
       note: l.note || null,
       detail: l.detail || null,
-      source: safeUrl(l.source),
+      // the backend may add a note after the address ("https://... (+ aliases)"): link to the address alone
+      source: safeUrl(String(l.source || '').trim().split(/\s+/)[0]),
       sample: l.sample || null,
       records: ok ? l.records : reason ? 0 : null,
       loaded: s.cached ? fmtAge(s.age_seconds) : 'Not loaded',
