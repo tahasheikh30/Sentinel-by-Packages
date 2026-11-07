@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useRef } from 'react'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import { config, configProblems } from './lib/config'
 import { ROUTES, navigate, usePath, isLegalPath, isInfoPath } from './lib/nav'
@@ -22,7 +22,6 @@ const loadInfo = () => import('./pages/InfoPage')
 const LegalPage = lazy(loadLegal)
 const InfoPage = lazy(loadInfo)
 const WaitingScreen = lazy(() => import('./pages/WaitingScreen'))
-const Analytics = lazy(() => import('@vercel/analytics/react').then((m) => ({ default: m.Analytics })))
 
 // Start fetching the screen this address needs right now, in parallel with the sign in check, instead of
 // after it: the first paint no longer waits for a second round trip.
@@ -32,16 +31,6 @@ if (typeof window !== 'undefined') {
   else if (path === ROUTES.signIn || path === ROUTES.requestAccess) loadLogin().catch(() => {})
   else if (isInfoPath(path)) loadInfo().catch(() => {})
   else if (isLegalPath(path)) loadLegal().catch(() => {})
-}
-
-// Analytics is not needed to use the app, so it loads after the first screen and never delays it.
-function DeferredAnalytics() {
-  const [ready, setReady] = useState(false)
-  useEffect(() => {
-    const id = typeof requestIdleCallback === 'function' ? requestIdleCallback(() => setReady(true), { timeout: 3000 }) : setTimeout(() => setReady(true), 1500)
-    return () => (typeof cancelIdleCallback === 'function' ? cancelIdleCallback(id) : clearTimeout(id))
-  }, [])
-  return ready ? <Suspense fallback={null}><Analytics /></Suspense> : null
 }
 
 /**
@@ -117,7 +106,6 @@ export default function App() {
           <Suspense fallback={<Splash>Loading...</Splash>}>
             <Router />
           </Suspense>
-          <DeferredAnalytics />
         </PreferencesProvider>
       </ToastProvider>
     </AuthProvider>
