@@ -125,6 +125,13 @@ describe('admin AI switch', () => {
     expect((await screen.findByRole('switch', { name: 'AI search switch' })).disabled).toBe(true)
     expect(screen.getByText(/OPENROUTER_API_KEY/)).toBeTruthy()
   })
+  it('shows what the provider said went wrong, with a hint for a 404', async () => {
+    api.getAiAdmin.mockResolvedValue(cfg({ configured: true, enabled: true, state: 'on', available: true,
+      last_error: 'http_404: No endpoints found matching your data policy' }))
+    render(<ToastProvider><AiAdminPanel /></ToastProvider>)
+    expect(await screen.findByText(/No endpoints found matching your data policy/)).toBeTruthy()
+    expect(screen.getByText(/no provider that fits the privacy or request settings/)).toBeTruthy()
+  })
 })
 
 describe('AI search bar', () => {

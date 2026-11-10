@@ -10,6 +10,16 @@ const STATE_PILL = {
   on: ['good', 'On'], off: ['warn', 'Off'], paused: ['warn', 'Resting'], unconfigured: ['bad', 'No key on the server'],
 }
 
+// A plain-language pointer for the errors an administrator can fix. The server sends "http_404: what the provider said".
+function errorHint(lastError) {
+  const code = String(lastError || '').split(':')[0].trim()
+  if (code === 'http_404') return 'The model has no provider that fits the privacy or request settings. Check the model name and the data use setting on the server.'
+  if (code === 'http_401' || code === 'http_403') return 'The key was not accepted. Check OPENROUTER_API_KEY on the server.'
+  if (code === 'http_402') return 'The OpenRouter account is out of credit.'
+  if (code === 'http_429') return 'OpenRouter is rate limiting this key. Try again shortly.'
+  return ''
+}
+
 /**
  * Administrators: the AI search switch and its features. The key itself lives only in the server's environment and is
  * never shown here. With the switch off, or no key, the app works exactly as it does without AI.
@@ -78,7 +88,15 @@ export default function AiAdminPanel() {
                 <div className="fact"><dt>Sent to the model</dt><dd>{cfg.privacy.sent}</dd></div>
                 <div className="fact"><dt>Provider data use</dt><dd>{cfg.privacy.data_collection === 'deny' ? 'Providers may not keep or train on it' : cfg.privacy.data_collection}{cfg.privacy.zero_data_retention ? ', zero retention required' : ''}</dd></div>
                 <div className="fact"><dt>Today</dt><dd>{cfg.usage_today.calls} calls, {cfg.usage_today.failures} failed (limit {cfg.limits.daily_calls})</dd></div>
-                {cfg.last_error && <div className="fact"><dt>Last error</dt><dd>{cfg.last_error}</dd></div>}
+                {cfg.last_error && (
+                  <div className="fact">
+                    <dt>Last error</dt>
+                    <dd style={{ overflowWrap: 'anywhere' }}>
+                      {cfg.last_error}
+                      {errorHint(cfg.last_error) && <span className="field-hint" style={{ display: 'block' }}>{errorHint(cfg.last_error)}</span>}
+                    </dd>
+                  </div>
+                )}
               </dl>
               <div className="memo-actions">
                 <button type="button" className="btn btn-quiet btn-small" onClick={check} disabled={busy}>Test the key</button>
