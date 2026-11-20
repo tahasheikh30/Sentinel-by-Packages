@@ -142,7 +142,7 @@ function Results({ batch, onNew, onOpen }) {
   const count = (id) => (id === 'AI_CLEAR' ? rows.filter(isAiClear).length : rows.filter((r) => outcomeOf(r) === id).length)
   const shown = useMemo(() => rows.filter((r) => filter === 'all' || (filter === 'AI_CLEAR' ? isAiClear(r) : outcomeOf(r) === filter)), [rows, filter])
   const notScreened = count('NOT_SCREENED')
-  const hasEvidence = count('ESCALATE_TO_COMPLIANCE') + count('MANUAL_REVIEW') > 0
+  const hasEvidence = rows.some(isScreened)      // every screened row has an evidence PDF, cleared ones included
 
   async function download(kind) {
     setBusy(kind)
@@ -151,7 +151,7 @@ function Results({ batch, onNew, onOpen }) {
       await (kind === 'results' ? downloadBatchResults(batch.id) : downloadBatchEvidence(batch.id))
     } catch (err) {
       if (err instanceof ApiError && err.code === 'EVIDENCE_NOT_GENERATED') {
-        toast.info('No evidence PDFs', { category: 'screening', message: 'An evidence PDF is only made when a row has a match or an adverse news lead.', log: false })
+        toast.info('No evidence PDFs', { category: 'screening', message: 'No evidence PDF could be made for this batch. Open a row to see its case, or run the batch again.', log: false })
       } else {
         setDownloadError(err)
       }

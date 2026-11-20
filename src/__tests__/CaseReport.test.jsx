@@ -83,10 +83,16 @@ describe('CaseReport', () => {
     expect(screen.queryByText('Clear', { selector: '.stamp' })).toBeNull()
   })
 
-  it('renders a clear result with no evidence button', () => {
-    render(<CaseReport caseData={base([result('UNSC', 'CLEAR', { list_version: '2026-09-30T08:00:00Z' })], 'AUTO_CLEAR')} applicant={{}} />)
+  it('renders a clear result with its evidence button, and without one when the case predates cleared-case PDFs', async () => {
+    const withPdf = base([result('UNSC', 'CLEAR', { list_version: '2026-09-30T08:00:00Z', evidence_file: 'evidence_c.pdf', id: 31 })], 'AUTO_CLEAR')
+    const { unmount } = render(<CaseReport caseData={withPdf} applicant={{}} />)
     expect(screen.getByRole('heading', { name: 'No match found' })).toBeTruthy()
     expect(screen.getByText(/list dated/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Download evidence PDF' }))
+    await waitFor(() => expect(downloadEvidence).toHaveBeenCalledWith(31, 'evidence_c.pdf'))
+    unmount()
+
+    render(<CaseReport caseData={base([result('UNSC', 'CLEAR')], 'AUTO_CLEAR')} applicant={{}} />)
     expect(screen.queryByRole('button', { name: 'Download evidence PDF' })).toBeNull()
   })
 

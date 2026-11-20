@@ -47,7 +47,7 @@ const STEPS = [
   },
   {
     title: "One verdict, with a next step",
-    copy: "The sources roll up into a single verdict, and the screening is saved to History with an evidence PDF whenever something is found.",
+    copy: "The sources roll up into a single verdict, and the screening is saved to History with an evidence PDF, whether or not anything is found.",
   },
 ];
 

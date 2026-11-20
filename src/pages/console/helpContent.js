@@ -189,7 +189,7 @@ export const SECTIONS = [
         items: [
           'The totals show how many rows need escalating, need review, are clear, and were not screened.',
           '**Download results (.xlsx)** gives one line per row of your file, including rows that were not screened.',
-          '**Evidence (.zip)** holds every evidence PDF the batch produced. It is only available when a row had a match or a news lead.',
+          '**Evidence (.zip)** holds the evidence PDF of every row that was screened, cleared rows included, with a list of their SHA-256 fingerprints.',
           '**Screen another file** starts again.',
         ],
       },
@@ -247,7 +247,7 @@ export const SECTIONS = [
       { t: 'h', text: 'The evidence PDF' },
       {
         t: 'p',
-        text: 'When a screening finds a match or a news lead, **Download evidence PDF** appears under the verdict. The report has the result, the applicant, what was checked, one card per match and a block for the reviewer\'s decision, so it can go straight into a compliance file.',
+        text: 'Every screening, including one that finds nothing, has a **Download evidence PDF** button under the verdict. A cleared screening\'s report reads "No match" and records what was checked, when and at what threshold. The report has the result, the applicant, what was checked, one card per match and a block for the reviewer\'s decision, so it can go straight into a compliance file. Cases cleared before this was added have no PDF.',
       },
       {
         t: 'note', tone: 'warn', title: 'A result is a lead, not a ruling',
@@ -533,7 +533,7 @@ export const SECTIONS = [
           { term: 'NACTA', text: 'Pakistan\'s National Counter Terrorism Authority. Its Fourth Schedule lists proscribed persons.' },
           { term: 'FIA Red Book', text: 'The Federal Investigation Agency\'s list of most wanted people.' },
           { term: 'OFAC', text: 'The US Treasury\'s Office of Foreign Assets Control, which publishes the SDN and Consolidated sanctions lists.' },
-          { term: 'Evidence PDF', text: 'The report made when a screening finds a match or a news lead, for the compliance file.' },
+          { term: 'Evidence PDF', text: 'The report made for every screening, whether or not it found anything, for the compliance file.' },
           { term: 'AI search', text: 'An optional layer that reads Urdu names, close matches and news, searches the open web and drafts memos. It only adds caution and its findings are leads to verify.' },
           { term: 'Case memo', text: 'A written summary of a case with numbered evidence, a recommendation and an approval line, drafted for the officer to edit and approve.' },
           { term: 'Digest', text: 'Exact counts of recent monitoring alerts for 7, 30 or 90 days, with an optional written summary.' },
