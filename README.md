@@ -18,7 +18,7 @@ matches and news leads, a next step, and one card per source. Each match
 shows its score, reference, programme, listed date of birth (flagged when
 the birth year matches), nationality, aliases and the source's remarks.
 News leads link out to the article. The evidence PDF downloads from the
-verdict.
+verdict, for a cleared screening as well as for a finding.
 
 A source that could not be downloaded or read is shown as **Not screened**
 and makes the verdict at best Review. It is never shown as clear. A source

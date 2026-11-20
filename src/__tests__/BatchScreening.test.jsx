@@ -262,7 +262,7 @@ describe('a real batch', () => {
     expect(screen.getAllByRole('row').length).toBe(5)
   })
 
-  it('downloads the results, and only offers evidence when something was found', async () => {
+  it('downloads the results and the evidence zip', async () => {
     api.startBatch.mockResolvedValue(finishedBatch())
     api.downloadBatchResults.mockResolvedValue()
     renderBatch()
@@ -278,10 +278,23 @@ describe('a real batch', () => {
     expect(api.downloadBatchEvidence).toHaveBeenCalledWith(7)
   })
 
-  it('has no evidence button to press when every row was clear', async () => {
+  it('still offers the evidence zip when every row was clear, because cleared rows have a PDF too', async () => {
     api.startBatch.mockResolvedValue(finishedBatch({
       counts: { screened: 2, invalid: 0, failed: 0, pending: 0, ESCALATE_TO_COMPLIANCE: 0, MANUAL_REVIEW: 0, AUTO_CLEAR: 2 },
       rows: [row(2), row(3)], total: 2, done: 2,
+    }))
+    renderBatch()
+    upload(file('applicants.xlsx'))
+    fireEvent.click(screen.getByRole('button', { name: 'Run batch screening' }))
+    await act(async () => {})
+    expect(screen.getByRole('button', { name: 'Evidence (.zip)' }).disabled).toBe(false)
+  })
+
+  it('has no evidence button to press when no row was screened', async () => {
+    api.startBatch.mockResolvedValue(finishedBatch({
+      counts: { screened: 0, invalid: 2, failed: 0, pending: 0, ESCALATE_TO_COMPLIANCE: 0, MANUAL_REVIEW: 0, AUTO_CLEAR: 0 },
+      rows: [{ ...row(2), state: 'invalid', overall_status: null }, { ...row(3), state: 'invalid', overall_status: null }],
+      total: 2, done: 2,
     }))
     renderBatch()
     upload(file('applicants.xlsx'))
